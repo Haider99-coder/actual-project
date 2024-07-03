@@ -1,0 +1,54 @@
+import pygame , sys
+from player import player
+
+class Game:
+   def __init__(self):
+      player_sprite = player((300,799),700,5)
+      self.player = pygame.sprite.GroupSingle(player_sprite)
+      
+
+   def run(self):
+      self.player.update()
+      self.player.draw(screen)
+   # update all sprite groups
+   # draw all sprite groups
+   
+
+if __name__ == '__main__':
+     pygame.init()
+     screen_width = 600
+     screen_height = 800
+     screen = pygame.display.set_mode((screen_width,screen_height))
+     clock = pygame.time.Clock()
+     game = Game()
+
+while True:
+    for event in pygame.event.get():
+       if event.type == pygame.QUIT:
+        pygame.quit()
+        sys.exit()
+
+    screen.fill((30,30,30))
+    game.run()
+
+    pygame.display.flip()
+    clock.tick(60)
+
+
+# uploadin my sprites for my game
+
+#Red_spaceship = pygame.image.load('pixel_ship_red_small.png')
+#green_spaceship = pygame.image.load('pixel_ship_green_small.png')
+#blue_spaceship = pygame.image.load('pixel_ship_blue_small.png')
+
+# mian player ship , will be included functionality with player_ship
+#PLAYER_ship = pygame.image.load('spaceship.png')
+
+# lasers
+#RED_LASER = pygame.image.load('pixel_laser_red.png')
+#GREEN_LASER = pygame.image.load('pixel_laser_green.png')
+#BLUE_LASER = pygame.image.load('pixel_laser_blue.png')
+#YELLOW_LASER = pygame.image.load('pixel_laser_blue.png')
+
+# background image
+#GREY_background = pygame.image.load('backround space.png')
