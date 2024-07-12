@@ -1,4 +1,5 @@
 import pygame
+from laser import Laser
 
 class player(pygame.sprite.Sprite):
     def __init__(self,pos,constraint,speed):
@@ -13,6 +14,10 @@ class player(pygame.sprite.Sprite):
         # measuring time when game started...
         self.laser_recharge = 600
         # allows the main player to shoot every 600 milliseconds 
+
+        self.lasers = pygame.sprite.Group()
+       # this is my laser sprite class
+        
 
     def get_input(self):
         keys = pygame.key.get_pressed()
@@ -43,14 +48,23 @@ class player(pygame.sprite.Sprite):
      if self.rect.left <= 0:
         self.rect.left = 0
         #doesnt allow player to move off the screen doesnt go less than pos of 0
-     if self.rect.right >= self.max_x_constraint:
-        self.rect.right = self.max_x_constraint
+     if self.rect.right >= 600: # self.max_x_constraint
+        self.rect.right = 600#self.max_x_constraint
         # doesnt allow player to move off screen when its further to the left
         #constraint method is a rule or condition that limits or restricts possible solutions to a problem
     def shoot_laserweapon(self):
-       print('beware lasers incoming')
+        self.lasers.add(Laser(self.rect.center))
+
+
+       #print('beware lasers incoming')
+
+    
+        self.lasers.add(Laser(self.rect.center))
 
     def update(self):
         self.get_input()
         self.constraint()
         self.recharge()
+        self.lasers.update()
+
+
