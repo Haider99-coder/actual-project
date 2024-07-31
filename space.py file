@@ -1,15 +1,60 @@
-import pygame , sys
+import pygame 
 from player import player
+import obstacle
+from enemies import Alien
 
 class Game:
    def __init__(self):
-      player_sprite = player((300,799),700,5)
+      # set up for the player
+      player_sprite = player((300,799),700,5) 
       self.player = pygame.sprite.GroupSingle(player_sprite)
+
+
+      #obstacle set up
+      self.barrier= obstacle.barrier # barrier reprents the variable for the obstacle/shape
+      self.block_size = 6 # this represents 6 pixels
+      self.blocks = pygame.sprite.Group() # this is a group that allows us to collect all of the sprites
+      self.obstacle_total = 4 # 4 OBSTACLES WILL BE PLACED e.g 0,1,2,3
+      self.obstacle_x_positions = [num * (screen_width / self.obstacle_total) for num in range(self.obstacle_total)]
+      self.create_many_shapes(*self.obstacle_x_positions, x_startingpoint = screen_width/15, y_startingpoint = 600)
+      #self.create_shape(30,600)
+
+      #alien setup
+      self.enemies = pygame.sprite.Group
+      self.aliens = pygame
+
+   def create_shape(self, x_startingpoint, y_startingpoint,offset_x): 
+               # function passed for creating the shape and includes 2 variables for the x co-ordinate and the y co-ordinate
+      for row_index , row in enumerate(self.barrier):
+               # the enumerated method returns what row we are on
+         for col_index,col in enumerate(row):
+               # returns what index we are on such as 0,0 , 0,1 ect
+            if col == "x":
+               x = x_startingpoint + col_index * self.block_size + offset_x
+               # e.g if startingpoint 50 and col_index is 2 ; self block size is 6 than 50+2*6 ...
+               y = y_startingpoint + row_index * self.block_size 
+               # e.g if starting point is 50 , ' row_index is 3 and ' self.block_size' is 6 than 50+3*6 = 68
+               block = obstacle.Block(self.block_size,('red'),x,y)
+               self.blocks.add(block)
+
+   def create_many_shapes(self,*offset,x_startingpoint,y_startingpoint): #offset method allows to calculate how far each obstacle need to be from each other
+      for offset_x in offset:
+         self.create_shape(x_startingpoint,y_startingpoint, offset_x)
+
+
+
+
+
+
+
+
       
 
    def run(self):
       self.player.update()
+      self.player.sprite.lasers.draw(screen)
       self.player.draw(screen)
+      self.blocks.draw(screen)
    # update all sprite groups
    # draw all sprite groups
    
@@ -52,3 +97,4 @@ while True:
 
 # background image
 #GREY_background = pygame.image.load('backround space.png')
+   
