@@ -1,7 +1,9 @@
-import pygame 
+import pygame , sys
 from player import player
 import obstacle
-from enemies import Alien
+from enemies import Alien, Extra
+from random import choice , randint
+from laser import Laser
 
 class Game:
    def __init__(self):
@@ -20,8 +22,15 @@ class Game:
       #self.create_shape(30,600)
 
       #alien setup
-      self.enemies = pygame.sprite.Group
-      self.aliens = pygame
+      self.enemies = pygame.sprite.Group() # all the aliens will be contained within this group
+      self.enemies_create(rows = 6 ,cols = 8 )
+      self.enemies_direction = 1
+      self.enemies_shoot = pygame.sprite.Group()
+
+# set up for additional enemy/boss
+      self.extra = pygame.sprite.GroupSingle()
+      self.extra_spawn_time = randint(50,90)
+      
 
    def create_shape(self, x_startingpoint, y_startingpoint,offset_x): 
                # function passed for creating the shape and includes 2 variables for the x co-ordinate and the y co-ordinate
@@ -37,13 +46,74 @@ class Game:
                block = obstacle.Block(self.block_size,('red'),x,y)
                self.blocks.add(block)
 
+   
+
+
    def create_many_shapes(self,*offset,x_startingpoint,y_startingpoint): #offset method allows to calculate how far each obstacle need to be from each other
       for offset_x in offset:
          self.create_shape(x_startingpoint,y_startingpoint, offset_x)
 
 
+   def enemies_create(self,rows,cols,distance_of_x = 60,distance_of_y=48, x_offset = 70,y_offset = 100): # funtion for creating the aliens
+      for row_index, row in enumerate(range(rows)):
+         for col_index, col in enumerate(range(cols)):
+            x = col_index * distance_of_x + x_offset 
+            y = row_index * distance_of_y + y_offset
+
+            if row_index == 0: # if row 0 then we create a blue alien
+              image_path = 'sprites/pixel_ship_blue_small.png'
+            elif 1 <= row_index <= 2: # if we are between row 1 and 2 than we set the pixels to green
+              image_path =  'sprites/pixel_ship_green_small.png'
+            else: # any other row is set to red
+                image_path = 'sprites/pixel_ship_red_small.png'
+
+            enemies_sprite = Alien(image_path, x, y)
+            self.enemies.add(enemies_sprite)
+
+   def check_pos_of_enemies(self):
+      every_enemie = self.enemies.sprites()
+      for enemie in every_enemie:
+         if enemie.rect.right >= 600:
+            self.enemies_direction = -1
+            self.enemies_move_downwards(2)
+         elif enemie.rect.left <= 0:
+            self.enemies_direction = 1
+            self.enemies_move_downwards(2)
+
+   def enemies_move_downwards(self,distance):
+      if self.enemies: # only ran in alien class
+           for enemie in self.enemies.sprites():
+            enemie.rect.y += distance
+
+   def enemies_laser(self):
+      if self.enemies.sprites():
+         any_enemy = choice(self.enemies.sprites()) 
+         weapon_laser = Laser(any_enemy.rect.center,6,700) 
+         self.enemies_shoot.add(weapon_laser)
+
+   #def boss_timer(self):
+      #self.additional_time_spawn -= 1
+      #if self.additional_time_spawn <= 0:
+        # self.boss.add(Boss(choice(['right','left']),600))
+         #self.additional_time_spawn = randint(500,800)
+
+ #  def extra_alien_timer(self):
+      #self.extra_spawn_time -=1
+      #if self.extra_spawn_time <= 0:
+      #   self.extra.add(Extra(choice(['right', 'left']), screen_width))
+        # self.extra_spawn_time = randint(400,800)
+
+   def additional_single_boss_timer(self):
+      self.extra_spawn_time -= 1
+      if self.extra_spawn_time <= 0:
+         self.extra.add(Extra(choice(['right', 'left']), screen_width))
+         self.extra_spawn_time = randint(400,800)
 
 
+
+
+   
+        
 
 
 
@@ -52,9 +122,26 @@ class Game:
 
    def run(self):
       self.player.update()
+      self.enemies.update(self.enemies_direction)
+      self.check_pos_of_enemies()
       self.player.sprite.lasers.draw(screen)
       self.player.draw(screen)
       self.blocks.draw(screen)
+      self.enemies.draw(screen)
+
+      self.additional_single_boss_timer()
+      self.extra.update()
+
+      self.extra.draw(screen)
+      
+
+      
+     
+
+     # self.enemies_laser()
+      self.enemies_shoot.update()
+      self.enemies_shoot.draw(screen)      
+      
    # update all sprite groups
    # draw all sprite groups
    
@@ -67,12 +154,23 @@ if __name__ == '__main__':
      clock = pygame.time.Clock()
      game = Game()
 
+     ENEMIELASER = pygame.USEREVENT + 1
+     pygame.time.set_timer(ENEMIELASER,800)
+
+    
+
+
 while True:
     for event in pygame.event.get():
        if event.type == pygame.QUIT:
         pygame.quit()
         sys.exit()
 
+       if event.type == ENEMIELASER:
+          game.enemies_laser()
+       
+
+       
     screen.fill((30,30,30))
     game.run()
 
@@ -97,4 +195,3 @@ while True:
 
 # background image
 #GREY_background = pygame.image.load('backround space.png')
-   
